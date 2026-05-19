@@ -1,0 +1,19 @@
+{
+    "name": "order-domain",
+    "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "libs/order/domain/src",
+    "projectType": "library",
+    "tags": ["scope:order", "type:lib"],
+    "targets": {
+        "build": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "outputPath": "dist/libs/order/domain",
+                "main": "libs/order/domain/src/index.ts",
+                "tsConfig": "libs/order/domain/tsconfig.lib.json",
+                "assets": ["libs/order/domain/*.md"]
+            }
+        }
+    }
+}
