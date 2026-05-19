@@ -1,0 +1,30 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "rootDir": ".",
+        "sourceMap": true,
+        "declaration": false,
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "target": "es2015",
+        "module": "esnext",
+        "lib": ["es2020", "dom"],
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "paths": {
+            "@doms/shared/kernel": ["./libs/shared/kernel/src/index.ts"],
+            "@doms/shared/events": ["./libs/shared/events/src/index.ts"],
+            "@doms/shared/idempotency": ["./libs/shared/idempotency/src/index.ts"],
+            "@doms/shared/outbox": ["./libs/shared/outbox/src/index.ts"],
+            "@doms/order/domain": ["./libs/order/domain/src/index.ts"],
+            "@doms/order/application": ["./libs/order/application/src/index.ts"],
+            "@doms/order/infrastructure": ["./libs/order/infrastructure/src/index.ts"],
+            "@doms/inventory/domain": ["./libs/inventory/domain/src/index.ts"],
+            "@doms/inventory/application": ["./libs/inventory/application/src/index.ts"],
+            "@doms/inventory/infrastructure": ["./libs/inventory/infrastructure/src/index.ts"]
+        }
+    },
+    "exclude": ["node_modules", "tmp"]
+}

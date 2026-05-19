@@ -1,2 +1,6 @@
 ignoredBuiltDependencies:
   - nx
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - unrs-resolver

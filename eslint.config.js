@@ -19,7 +19,7 @@ module.exports = [
             '@nx/enforce-module-boundaries': [
                 'error',
                 {
-                    enforceBuildableLibDependencyCheck: true,
+                    enforceBuildableLibDependency: true,
                     depConstraints: [
                         { sourceTag: 'scope:shared', onlyDependOnLibsWithTags: ['scope:shared'] },
                         {

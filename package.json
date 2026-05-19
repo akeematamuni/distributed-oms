@@ -5,15 +5,33 @@
     "devDependencies": {
         "@commitlint/cli": "^21.0.1",
         "@commitlint/config-conventional": "^21.0.1",
+        "@nestjs/schematics": "^11.0.0",
+        "@nestjs/testing": "^11.0.0",
         "@nx/eslint": "^22.7.2",
         "@nx/eslint-plugin": "^22.7.2",
+        "@nx/jest": "22.7.2",
+        "@nx/js": "22.7.2",
+        "@nx/nest": "22.7.2",
+        "@swc-node/register": "~1.11.1",
+        "@swc/core": "~1.15.5",
+        "@swc/helpers": "~0.5.18",
+        "@types/jest": "~30.0.0",
+        "@types/node": "20.19.9",
         "@typescript-eslint/eslint-plugin": "^8.59.3",
         "@typescript-eslint/parser": "^8.59.3",
         "eslint": "^10.3.0",
         "husky": "^9.1.7",
+        "jest": "~30.3.0",
+        "jest-environment-node": "~30.3.0",
+        "jest-util": "~30.3.0",
+        "jsonc-eslint-parser": "^2.1.0",
         "lint-staged": "^17.0.4",
         "nx": "22.7.2",
-        "prettier": "^3.8.3"
+        "prettier": "^3.8.3",
+        "ts-jest": "^29.4.0",
+        "ts-node": "10.9.1",
+        "tslib": "^2.3.0",
+        "typescript": "~5.9.2"
     },
     "scripts": {
         "prepare": "husky"
@@ -25,5 +43,12 @@
         "*.{ts,js}": [
             "eslint --fix"
         ]
+    },
+    "dependencies": {
+        "@nestjs/common": "^11.0.0",
+        "@nestjs/core": "^11.0.0",
+        "@nestjs/platform-express": "^11.0.0",
+        "reflect-metadata": "^0.1.13",
+        "rxjs": "^7.8.0"
     }
 }
