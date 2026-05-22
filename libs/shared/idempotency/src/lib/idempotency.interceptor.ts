@@ -28,15 +28,15 @@ export class IdempotencyInterceptor implements NestInterceptor {
 
         const key = request.headers[IDEMPOTENCY_KEY_HEADER];
         if (!key)
-            throw new HttpException('Idempotency-key header is required', HttpStatus.BAD_REQUEST);
+            throw new HttpException('Idempotency-Key header is required', HttpStatus.BAD_REQUEST);
 
-        const cached = this.store.get(key);
+        const cached = await this.store.get(key);
         if (cached) {
             this.logger.log(`Idempotency hit for key: ${key}`);
             return of(cached);
         }
 
-        const ttlSeconds = this.config.get('TTL_SECONDS');
+        const ttlSeconds = this.config.get('TTL_SECONDS') ?? 86400;
         return next.handle().pipe(
             tap(async (response) => {
                 await this.store.set(key, response, ttlSeconds);
