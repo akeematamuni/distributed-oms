@@ -36,7 +36,7 @@ export class IdempotencyInterceptor implements NestInterceptor {
             return of(cached);
         }
 
-        const ttlSeconds = this.config.get('TTL_SECONDS') ?? 86400;
+        const ttlSeconds = this.config.get('TTL_SECONDS', 86400);
         return next.handle().pipe(
             tap(async (response) => {
                 await this.store.set(key, response, ttlSeconds);
