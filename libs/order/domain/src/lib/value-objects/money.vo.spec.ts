@@ -50,11 +50,11 @@ describe('Money', () => {
         });
 
         it('should throw if factor is a float', () => {
-            expect(money.multiply(1.5)).toThrow();
+            expect(() => money.multiply(1.5)).toThrow();
         });
 
         it('should throw if factor is negative', () => {
-            expect(money.multiply(-1)).toThrow();
+            expect(() => money.multiply(-1)).toThrow();
         });
     });
 
