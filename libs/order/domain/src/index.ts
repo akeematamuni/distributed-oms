@@ -1,1 +1,1 @@
-export * from './lib/order-domain';
+export * from './lib/value-objects/money.vo';
