@@ -1,24 +1,31 @@
 import { EntityBase } from './entity.base';
 
-class TestEntity extends EntityBase<{ name: string }> {
-    constructor(id: string) {
-        super(id);
+interface TestEntityProps {
+    name: string;
+}
+
+class TestEntity extends EntityBase<TestEntityProps> {
+    constructor(props: TestEntityProps, id: string) {
+        super(props, id);
     }
 }
 
-class OtherEntity extends EntityBase<{ name: string }> {
-    constructor(id: string) {
-        super(id);
+class OtherEntity extends EntityBase<TestEntityProps> {
+    constructor(props: TestEntityProps, id: string) {
+        super(props, id);
     }
 }
 
 describe('EntityBase', () => {
-    const a = new TestEntity('entity-001');
-    const b = new TestEntity('entity-001');
-    const c = new TestEntity('entity-002');
+    const validUUID = '5fa24cc8-6dba-48bf-9da3-2daf0476b6ad';
+    const anotherUUID = '8665fa9b-78ae-4998-8eef-7edce3aa3426';
+    const a = new TestEntity({ name: 'entity-001' }, validUUID);
+    const b = new TestEntity({ name: 'entity-002' }, validUUID);
+    const c = new TestEntity({ name: 'entity-003' }, anotherUUID);
+    const o = new OtherEntity({ name: 'entity-004' }, validUUID);
 
     it('should expose the id via getter', () => {
-        expect(a.id).toBe('entity-001');
+        expect(a.id).toBe(validUUID);
     });
 
     it('should return true for two entities with the same id', () => {
@@ -38,8 +45,6 @@ describe('EntityBase', () => {
     });
 
     it('should return true regardless of subclass type as long as id matches', () => {
-        // EntityBase uses instanceof EntityBase
-        const o = new OtherEntity('entity-001');
         expect(a.equals(o as unknown as TestEntity)).toBe(true);
     });
 });
