@@ -1,12 +1,13 @@
 import { OutboxRecord } from './outbox.entity';
 
-export interface OutboxRepositoryPort {
+export interface IOutboxRepositoryPort {
     save(
         record: Omit<OutboxRecord, 'id' | 'createdAt' | 'publishedAt' | 'retryCount'>,
+        queryRunner?: unknown,
     ): Promise<void>;
-    findPending(limit: number): Promise<OutboxRecord[]>;
-    markPublished(id: string): Promise<void>;
-    markFailed(id: string): Promise<void>;
+    findPending(limit: number, queryRunner?: unknown): Promise<OutboxRecord[]>;
+    markPublished(id: string, queryRunner?: unknown): Promise<void>;
+    markFailed(id: string, queryRunner?: unknown): Promise<void>;
 }
 
 export const OUTBOX_REPOSITORY = Symbol('OUTBOX_REPOSITORY');
