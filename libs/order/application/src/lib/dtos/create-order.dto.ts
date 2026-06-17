@@ -18,7 +18,7 @@ export class CreateOrderDto implements CreateOrderInput {
 
     @ApiProperty({ type: () => AddressDto })
     @Type(() => AddressDto)
-    @ValidateNested({ each: true })
+    @ValidateNested()
     shippingAddress!: AddressDto;
 
     @ApiProperty({ type: () => [OrderLineDto] })
