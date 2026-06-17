@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Observable, of, tap } from 'rxjs';
-import { IDEMPOTENCY_STORE, IdempotencyStorePort } from './idempotency.store.port';
+import { IDEMPOTENCY_STORE, IIdempotencyStorePort } from './idempotency.store.port';
 
 const IDEMPOTENCY_KEY_HEADER = 'idempotency-key';
 
@@ -20,7 +20,7 @@ export class IdempotencyInterceptor implements NestInterceptor {
 
     constructor(
         @Inject(ConfigService) private readonly config: ConfigService,
-        @Inject(IDEMPOTENCY_STORE) private readonly store: IdempotencyStorePort,
+        @Inject(IDEMPOTENCY_STORE) private readonly store: IIdempotencyStorePort,
     ) {}
 
     async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<unknown>> {
