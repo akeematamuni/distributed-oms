@@ -4,26 +4,14 @@ import { Money } from '../value-objects/money.vo';
 import { OrderLine } from '../entities/order-line.entity';
 
 export class OrderCreatedEvent extends DomainEventBase {
-    public readonly customerId: string;
-    public readonly shippingAddress: Address;
-    public readonly channel: string;
-    public readonly totalAmount: Money;
-    public readonly lines: OrderLine[];
-
     constructor(
-        orderId: string,
-        customerId: string,
-        shippingAddress: Address,
-        channel: string,
-        totalAmount: Money,
-        lines: OrderLine[],
-        eventType = OrderCreatedEvent.name,
+        public readonly orderId: string,
+        public readonly customerId: string,
+        public readonly channel: string,
+        public readonly shippingAddress: Address,
+        public readonly totalAmount: Money,
+        public readonly lines: OrderLine[],
     ) {
-        super(orderId, eventType);
-        this.customerId = customerId;
-        this.shippingAddress = shippingAddress;
-        this.channel = channel;
-        this.totalAmount = totalAmount;
-        this.lines = lines;
+        super(orderId, OrderCreatedEvent.name);
     }
 }
