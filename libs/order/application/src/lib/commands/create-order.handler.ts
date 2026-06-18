@@ -95,25 +95,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
         }
 
         // Build response, cache, and return
-        const response: OrderResponseDto = {
-            correlationId: command.correlationId,
-            orderId: order.id,
-            status: order.status.value,
-            customerId: order.customerId,
-            channel: order.channel,
-            totalAmount: order.totalAmount.amount,
-            currency: order.totalAmount.currency,
-            lines: order.lines.map((l) => ({
-                sku: l.sku,
-                quantity: l.quantity,
-                unitPrice: l.unitPrice.amount,
-                lineTotal: l.lineTotal().amount,
-                currency: l.lineTotal().currency,
-            })),
-            shippingAddress: order.shippingAddress,
-            createdAt: order.createdAt,
-            updatedAt: order.updatedAt,
-        };
+        const response = OrderResponseDto.fromDomain(order, command.correlationId);
 
         await this.store.set(
             command.correlationId,
