@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { OutboxStatus, OutboxRecord } from './outbox.entity';
-import { OutboxRepositoryPort } from './outbox.repository.port';
-import { OutboxPublisherPort } from './outbox.publisher.port';
+import { IOutboxRepositoryPort } from './outbox.repository.port';
+import { IOutboxPublisherPort } from './outbox.publisher.port';
 import { OutboxProcessor } from './outbox.processor';
 
 const makeRecord = (overrides: Partial<OutboxRecord> = {}): OutboxRecord => ({
@@ -15,14 +15,14 @@ const makeRecord = (overrides: Partial<OutboxRecord> = {}): OutboxRecord => ({
     ...overrides,
 });
 
-const mockRepository = (): jest.Mocked<OutboxRepositoryPort> => ({
+const mockRepository = (): jest.Mocked<IOutboxRepositoryPort> => ({
     save: jest.fn(),
     findPending: jest.fn(),
     markPublished: jest.fn(),
     markFailed: jest.fn(),
 });
 
-const mockPublisher = (): jest.Mocked<OutboxPublisherPort> => ({
+const mockPublisher = (): jest.Mocked<IOutboxPublisherPort> => ({
     publish: jest.fn(),
 });
 
@@ -33,8 +33,8 @@ const mockConfigService = (batchSize = 100): jest.Mocked<ConfigService> =>
 
 describe('OutboxProcessor', () => {
     let config: jest.Mocked<ConfigService>;
-    let repository: jest.Mocked<OutboxRepositoryPort>;
-    let publisher: jest.Mocked<OutboxPublisherPort>;
+    let repository: jest.Mocked<IOutboxRepositoryPort>;
+    let publisher: jest.Mocked<IOutboxPublisherPort>;
     let processor: OutboxProcessor;
 
     beforeEach(() => {
