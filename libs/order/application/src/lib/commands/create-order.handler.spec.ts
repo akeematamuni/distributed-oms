@@ -164,7 +164,7 @@ describe('CreateOrderHandler', () => {
 
             expect(mockIdempotencyStore.set).toHaveBeenCalledTimes(1);
             expect(mockIdempotencyStore.set).toHaveBeenCalledWith(
-                validCommand.correlationId,
+                `${validCommand.correlationId}:create-order`,
                 result,
                 86400,
             );
