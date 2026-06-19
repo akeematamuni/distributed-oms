@@ -32,7 +32,8 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
 
     async execute(command: CreateOrderCommand): Promise<OrderResponseDto> {
         // Retrun cached data based on correlationId
-        const cached = await this.store.get(command.correlationId);
+        const idempotencyKey = `${command.correlationId}:create-order`;
+        const cached = await this.store.get(idempotencyKey);
         if (cached) return cached as OrderResponseDto;
 
         // Construct order aggregate
@@ -97,11 +98,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
         // Build response, cache, and return
         const response = OrderResponseDto.fromDomain(order, command.correlationId);
 
-        await this.store.set(
-            command.correlationId,
-            response,
-            this.config.get('TTL_SECONDS', 86400),
-        );
+        await this.store.set(idempotencyKey, response, this.config.get('TTL_SECONDS', 86400));
 
         return response;
     }

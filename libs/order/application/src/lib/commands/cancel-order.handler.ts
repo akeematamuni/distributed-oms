@@ -27,7 +27,8 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
     ) {}
 
     async execute(command: CancelOrderCommand): Promise<OrderResponseDto> {
-        const cached = await this.idempotencyStore.get(command.correlationId);
+        const idempotencyKey = `${command.correlationId}:cancel-order`;
+        const cached = await this.idempotencyStore.get(idempotencyKey);
         if (cached) return cached as OrderResponseDto;
 
         let order: Order | null;
@@ -73,7 +74,7 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
         const response = OrderResponseDto.fromDomain(order, command.correlationId);
 
         await this.idempotencyStore.set(
-            command.correlationId,
+            idempotencyKey,
             response,
             this.config.get('TTL_SECONDS', 86400),
         );
