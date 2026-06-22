@@ -28,7 +28,7 @@ export class CreateOrderSaga {
         await this.invComPublisher.publish({
             orderId: payload.orderId,
             correlationId: payload.correlationId,
-            lines: payload.lines,
+            lines: payload.lines.map((l) => ({ sku: l.sku, quantity: l.quantity })),
         });
     }
 

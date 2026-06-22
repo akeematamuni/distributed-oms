@@ -2,7 +2,7 @@ export interface InventoryReservedEventPayload {
     reservationId: string;
     orderId: string;
     lines: Array<{
-        skuId: string;
+        sku: string;
         quantity: number;
         nodeId: string;
     }>;
