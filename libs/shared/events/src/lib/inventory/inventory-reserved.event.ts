@@ -6,7 +6,7 @@ export interface InventoryReservedEventPayload {
         quantity: number;
         nodeId: string;
     }>;
-    reservedAt: Date;
+    reservedAt: string;
     correlationId: string;
 }
 
