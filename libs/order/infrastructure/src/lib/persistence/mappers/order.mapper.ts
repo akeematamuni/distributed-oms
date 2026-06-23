@@ -40,6 +40,7 @@ export class OrderMapper {
         entity.state = domain.shippingAddress.state;
         entity.postcode = domain.shippingAddress.postcode;
         entity.country = domain.shippingAddress.country;
+        entity.version = domain.version;
         entity.lines = domain.lines.map((line) => OrderMapper.toPersistenceLine(line));
         return entity;
     }
