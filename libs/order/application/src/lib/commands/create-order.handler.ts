@@ -8,9 +8,10 @@ import { Order, Address, OrderLine, Money } from '@doms/order/domain';
 import { ORDER_REPOSITORY, IOrderRepository } from '@doms/order/domain';
 import { DataSource } from 'typeorm';
 import { OUTBOX_REPOSITORY, IOutboxRepositoryPort, OutboxStatus } from '@doms/shared/outbox';
+import { DomainEventsConverter } from '../converters/domain-event.convert';
 
 /**
- * Mapper in infrastructure would translate domain events to shared events structure
+ * Handler class to create order, save, and write to outbox
  */
 
 @CommandHandler(CreateOrderCommand)
@@ -69,11 +70,17 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
             await this.orderRepository.save(order, queryRunner);
 
             for (const event of domainEvents) {
+                // Convert domain events appropriately
+                const sharedEvent = DomainEventsConverter.toOutboxRecord(
+                    event,
+                    command.correlationId,
+                );
+
                 await this.outboxRepository.save(
                     {
-                        eventType: event.eventType,
+                        eventType: sharedEvent.eventType,
                         status: OutboxStatus.PENDING,
-                        payload: event as unknown as Record<string, unknown>,
+                        payload: sharedEvent.payload,
                     },
                     queryRunner,
                 );
