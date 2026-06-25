@@ -17,13 +17,17 @@ export class Quantity extends ValueObjectBase<QuantityProps> {
         return new Quantity({ value });
     }
 
-    // static fromRaw(value: number): Quantity {
-    //     if (!Number.isInteger(value) || value < 0) {
-    //         throw new Error('Quantity from raw must be non-negative integer');
-    //     }
+    static fromRaw(value: number): Quantity {
+        if (!Number.isInteger(value) || value < 0) {
+            throw new Error('Quantity from raw must be non-negative integer');
+        }
 
-    //     return new Quantity({ value });
-    // }
+        return new Quantity({ value });
+    }
+
+    static zero(): Quantity {
+        return new Quantity({ value: 0 });
+    }
 
     add(other: Quantity): Quantity {
         return new Quantity({ value: this.props.value + other.props.value });
@@ -38,13 +42,13 @@ export class Quantity extends ValueObjectBase<QuantityProps> {
         return new Quantity({ value: result });
     }
 
-    // isGreaterThan(other: Quantity): boolean {
-    //     return this.props.value > other.props.value;
-    // }
+    isGreaterThan(other: Quantity): boolean {
+        return this.props.value > other.props.value;
+    }
 
-    // isGreaterThanOrEqual(other: Quantity): boolean {
-    //     return this.props.value >= other.props.value;
-    // }
+    isGreaterThanOrEqual(other: Quantity): boolean {
+        return this.props.value >= other.props.value;
+    }
 
     get value(): number {
         return this.props.value;
