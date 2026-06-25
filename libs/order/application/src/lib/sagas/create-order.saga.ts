@@ -16,16 +16,16 @@ export class CreateOrderSaga {
     constructor(
         @Inject(CommandBus) private readonly commandBus: CommandBus,
         @Inject(INVENTORY_COMMAND_PUBLISHER)
-        private readonly invComPublisher: IInventoryCommandPublisher,
+        private readonly inventoryCommandPublisher: IInventoryCommandPublisher,
     ) {}
 
     /** Dispatches a ReserveInventoryCommand to the inventory service via Kafka */
     async onOrderCreated(payload: OrderCreatedEventPayload): Promise<void> {
         this.logger.log(
-            `Created for (${payload.orderId}). CorrelationId: ${payload.correlationId}`,
+            `Saga: order created for (${payload.orderId}). CorrelationId: ${payload.correlationId}`,
         );
 
-        await this.invComPublisher.publish({
+        await this.inventoryCommandPublisher.publish({
             orderId: payload.orderId,
             correlationId: payload.correlationId,
             lines: payload.lines.map((l) => ({ sku: l.sku, quantity: l.quantity })),
@@ -35,7 +35,7 @@ export class CreateOrderSaga {
     /** Confirm order on inventory.reservation.succeeded received */
     async onInventoryReservationSucceeded(payload: InventoryReservedEventPayload): Promise<void> {
         this.logger.log(
-            `Inventory reserved for order (${payload.orderId}). CorrelationId: ${payload.correlationId}`,
+            `Saga: inventory reserved for order (${payload.orderId}). CorrelationId: ${payload.correlationId}`,
         );
 
         await this.commandBus.execute(
