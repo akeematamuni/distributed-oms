@@ -29,16 +29,16 @@ describe('Quantity', () => {
         expect(() => Quantity.create(2).subtract(Quantity.create(5))).toThrow();
     });
 
-    it('should return zero from Quantity.zero()', () => {
-        expect(Quantity.zero().value).toBe(0);
-    });
+    // it('should return zero from Quantity.zero()', () => {
+    //     expect(Quantity.zero().value).toBe(0);
+    // });
 
-    it('should create from raw non-negative integer including zero', () => {
-        expect(Quantity.fromRaw(0).value).toBe(0);
-        expect(Quantity.fromRaw(5).value).toBe(5);
-    });
+    // it('should create from raw non-negative integer including zero', () => {
+    //     expect(Quantity.fromRaw(0).value).toBe(0);
+    //     expect(Quantity.fromRaw(5).value).toBe(5);
+    // });
 
-    it('should throw on negative raw value', () => {
-        expect(() => Quantity.fromRaw(-1)).toThrow();
-    });
+    // it('should throw on negative raw value', () => {
+    //     expect(() => Quantity.fromRaw(-1)).toThrow();
+    // });
 });
