@@ -14,6 +14,7 @@ const makeMockRepo = (): jest.Mocked<Repository<OrderOutboxTypeOrmEntity>> =>
 const makeOutboxRecord = (): OutboxRecord => ({
     id: randomUUID(),
     eventType: 'order.created',
+    eventVersion: 1,
     payload: { orderId: 'f2dd59be-b348-40b5-820c-6e23dae14d17' },
     status: OutboxStatus.PENDING,
     createdAt: new Date(),

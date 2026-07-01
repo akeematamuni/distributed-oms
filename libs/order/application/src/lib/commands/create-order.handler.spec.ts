@@ -137,7 +137,7 @@ describe('CreateOrderHandler', () => {
             expect(mockQueryRunner.rollbackTransaction).not.toHaveBeenCalled();
             expect(mockOutboxRepository.save).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    eventType: 'order.created',
+                    eventType: 'inventory.commands.reserve',
                     status: OutboxStatus.PENDING,
                 }),
                 mockQueryRunner,

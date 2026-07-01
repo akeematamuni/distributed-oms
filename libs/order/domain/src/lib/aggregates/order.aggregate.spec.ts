@@ -4,10 +4,10 @@ import { Money } from '../value-objects/money.vo';
 import { Address } from '../value-objects/address.vo';
 import { OrderStatusEnum } from '../value-objects/order-status.vo';
 import { InvalidOrderTransitionException } from '../exceptions/invalid-order-transition.exception';
-import { OrderCreatedEvent } from '../events/order-created.event';
-import { OrderConfirmedEvent } from '../events/order-confirmed.event';
-import { OrderCancelledEvent } from '../events/order-cancelled.event';
-import { InventoryAllocatedEvent } from '../events/inventory-allocated.event';
+import { OrderCreatedDomainEvent } from '../events/order-created.domain-event';
+import { OrderConfirmedDomainEvent } from '../events/order-confirmed.domain-event';
+import { OrderCancelledDomainEvent } from '../events/order-cancelled.domain-event';
+import { InventoryAllocatedDomainEvent } from '../events/inventory-allocated.domain-event';
 
 const validAddress = Address.create({
     street: '101 Ikemo St',
@@ -47,7 +47,7 @@ describe('Order', () => {
             const events = order.pullDomainEvents();
 
             expect(events).toHaveLength(1);
-            expect(events[0]).toBeInstanceOf(OrderCreatedEvent);
+            expect(events[0]).toBeInstanceOf(OrderCreatedDomainEvent);
         });
 
         it('should throw if no lines provided', () => {
@@ -82,7 +82,7 @@ describe('Order', () => {
             const events = order.pullDomainEvents();
 
             expect(events).toHaveLength(1);
-            expect(events[0]).toBeInstanceOf(OrderConfirmedEvent);
+            expect(events[0]).toBeInstanceOf(OrderConfirmedDomainEvent);
         });
 
         it('should throw if order is already CANCELLED', () => {
@@ -131,7 +131,7 @@ describe('Order', () => {
             const events = order.pullDomainEvents();
 
             expect(events).toHaveLength(1);
-            expect(events[0]).toBeInstanceOf(OrderCancelledEvent);
+            expect(events[0]).toBeInstanceOf(OrderCancelledDomainEvent);
         });
 
         it('should throw if order is already CANCELLED', () => {
@@ -180,7 +180,7 @@ describe('Order', () => {
             const events = order.pullDomainEvents();
 
             expect(events).toHaveLength(1);
-            expect(events[0]).toBeInstanceOf(InventoryAllocatedEvent);
+            expect(events[0]).toBeInstanceOf(InventoryAllocatedDomainEvent);
         });
 
         it('should throw if order is not CONFIRMED', () => {
