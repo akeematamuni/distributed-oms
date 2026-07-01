@@ -2,7 +2,7 @@ import { OutboxRecord } from './outbox.entity';
 
 export interface IOutboxRepositoryPort {
     save(
-        record: Omit<OutboxRecord, 'id' | 'createdAt' | 'publishedAt' | 'retryCount'>,
+        record: Omit<OutboxRecord, 'createdAt' | 'publishedAt' | 'retryCount'>,
         queryRunner?: unknown,
     ): Promise<void>;
     findPending(limit: number, queryRunner?: unknown): Promise<OutboxRecord[]>;

@@ -7,6 +7,7 @@ export enum OutboxStatus {
 export interface OutboxRecord {
     id: string;
     eventType: string;
+    eventVersion: number;
     payload: Record<string, unknown>;
     status: OutboxStatus;
     createdAt: Date;
