@@ -1,8 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { INVENTORY_COMMAND_PUBLISHER, IInventoryCommandPublisher } from '@doms/order/domain';
 import {
-    OrderCreatedEventPayload,
     InventoryReservedEventPayload,
     InventoryReservationFailedEventPayload,
 } from '@doms/shared/events';
@@ -13,24 +11,7 @@ import { CancelOrderCommand } from '../commands/cancel-order.command';
 export class CreateOrderSaga {
     private readonly logger = new Logger(CreateOrderSaga.name);
 
-    constructor(
-        @Inject(CommandBus) private readonly commandBus: CommandBus,
-        @Inject(INVENTORY_COMMAND_PUBLISHER)
-        private readonly inventoryCommandPublisher: IInventoryCommandPublisher,
-    ) {}
-
-    /** Dispatches a ReserveInventoryCommand to the inventory service via Kafka */
-    async onOrderCreated(payload: OrderCreatedEventPayload): Promise<void> {
-        this.logger.log(
-            `Saga: order created for (${payload.orderId}). CorrelationId: ${payload.correlationId}`,
-        );
-
-        await this.inventoryCommandPublisher.publish({
-            orderId: payload.orderId,
-            correlationId: payload.correlationId,
-            lines: payload.lines.map((l) => ({ sku: l.sku, quantity: l.quantity })),
-        });
-    }
+    constructor(@Inject(CommandBus) private readonly commandBus: CommandBus) {}
 
     /** Confirm order on inventory.reservation.succeeded received */
     async onInventoryReservationSucceeded(payload: InventoryReservedEventPayload): Promise<void> {
