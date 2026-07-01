@@ -1,7 +1,8 @@
 import { InventoryNode } from '../aggregates/inventory-node.aggregate';
 
 export interface IInventoryRepositoryPort {
-    save(inventoryNode: InventoryNode): Promise<void>;
+    findBySku(sku: string): Promise<InventoryNode[]>;
+    save(inventoryNode: InventoryNode, queryRunner: unknown): Promise<void>;
     findBySkuAndNode(sku: string, nodeId: string): Promise<InventoryNode | null>;
 }
 

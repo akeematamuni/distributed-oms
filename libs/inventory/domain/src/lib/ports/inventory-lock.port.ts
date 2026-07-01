@@ -1,4 +1,4 @@
-export interface InventoryLockPort {
+export interface IInventoryLockPort {
     acquire(key: string, ttlMs: number): Promise<boolean>;
     release(key: string): Promise<void>;
 }
