@@ -19,8 +19,9 @@ export class GetAvailabilityHandler implements IQueryHandler<GetAvailabilityQuer
         private readonly inventoryRepositiry: IInventoryRepositoryPort,
     ) {}
 
-    async execute(query: GetAvailabilityQuery): Promise<AvailabilityResponseDto> {
+    async execute(query: GetAvailabilityQuery): Promise<AvailabilityResponseDto | null> {
         const inventoryNodes = await this.inventoryRepositiry.findBySku(query.sku);
+        if (inventoryNodes.length < 1) return null;
 
         let totalAvailable = 0;
         let nodes: Array<{ nodeId: string; available: number }> = [];
