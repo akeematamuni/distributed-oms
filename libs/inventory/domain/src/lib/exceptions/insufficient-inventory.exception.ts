@@ -1,4 +1,6 @@
 export class InsufficientInventoryException extends Error {
+    readonly reason: string = 'INSUFFICIENT_INVENTORY';
+
     constructor(
         readonly sku: string,
         readonly nodeId: string,
