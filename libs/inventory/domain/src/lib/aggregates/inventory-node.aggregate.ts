@@ -2,8 +2,7 @@ import { AggregateRootBase, UniqueId, SKU } from '@doms/shared/kernel';
 import { Quantity } from '../value-objects/quantity.value-object';
 import { ReservationAlreadyExistsException } from '../exceptions/reservation-already-exists.exception';
 import { InsufficientInventoryException } from '../exceptions/insufficient-inventory.exception';
-import { InventoryReservedDomainEvent } from '../events/inventory-reserved.domain-event';
-import { ReservationFailedDomainEvent } from '../events/reservation-failed.domain-event';
+// import { InventoryReservedDomainEvent } from '../events/inventory-reserved.domain-event';
 import { ReservationNotFoundException } from '../exceptions/reservation-not-found.exception';
 
 export interface ReservationRecord {
@@ -55,17 +54,11 @@ export class InventoryNode extends AggregateRootBase {
     reserve(reservationId: string, orderId: string, quantity: Quantity): void {
         const alreadyExists = this.reservations.some((r) => r.reservationId === reservationId);
 
-        if (alreadyExists) {
-            this.apply(new ReservationFailedDomainEvent(orderId, 'RESERVATION_ALREADY_EXISTS'));
-
-            throw new ReservationAlreadyExistsException(reservationId);
-        }
+        if (alreadyExists) throw new ReservationAlreadyExistsException(reservationId);
 
         const available = this.available;
 
         if (quantity.isGreaterThan(available)) {
-            this.apply(new ReservationFailedDomainEvent(orderId, 'INSUFFICIENT_INVENTORY'));
-
             throw new InsufficientInventoryException(
                 this.sku,
                 this.nodeId,
@@ -83,15 +76,15 @@ export class InventoryNode extends AggregateRootBase {
             quantity: quantity.value,
         });
 
-        this.apply(
-            new InventoryReservedDomainEvent(
-                reservationId,
-                orderId,
-                this.sku,
-                this.nodeId,
-                quantity.value,
-            ),
-        );
+        // this.apply(
+        //     new InventoryReservedDomainEvent(
+        //         reservationId,
+        //         orderId,
+        //         this.sku,
+        //         this.nodeId,
+        //         quantity.value,
+        //     ),
+        // );
     }
 
     releaseReservation(reservationId: string): void {
