@@ -1,15 +1,15 @@
 import { Entity, PrimaryColumn, Column, Index, OneToMany, VersionColumn } from 'typeorm';
 
+// SKU and Node ID must have composite uniqueness
+@Index(['sku', 'nodeId'], { unique: true })
 @Entity('inventory_nodes')
 export class InventoryNodeTypeOrmEntity {
     @PrimaryColumn('uuid')
     id!: string;
 
-    @Index()
     @Column({ type: 'varchar' })
     sku!: string;
 
-    @Index()
     @Column({ name: 'node_id', type: 'varchar' })
     nodeId!: string;
 
