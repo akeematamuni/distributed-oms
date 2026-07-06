@@ -11,6 +11,8 @@ import { ConfigService } from '@nestjs/config';
 import { OrderCancelledEvent } from '@doms/shared/events';
 import { OrderCancelledDomainEvent } from '@doms/order/domain';
 
+// NOTE: This is just the system triggered cancellation
+// Later, I need to handle customer initiated cancellation
 @CommandHandler(CancelOrderCommand)
 export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
     public readonly logger = new Logger(CancelOrderHandler.name);
