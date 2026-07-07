@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, VersionColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, CreateDateColumn } from 'typeorm';
 import { OutboxStatus, OutboxRecord } from '@doms/shared/outbox';
 
 @Entity('order_outboxes')
@@ -9,7 +9,7 @@ export class OrderOutboxTypeOrmEntity implements OutboxRecord {
     @Column({ name: 'event_type', type: 'varchar' })
     eventType!: string;
 
-    @VersionColumn({ name: 'event_version', type: 'int' })
+    @Column({ name: 'event_version', type: 'int', default: 1 })
     eventVersion!: number;
 
     @Column({ type: 'jsonb' })
