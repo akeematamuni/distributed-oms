@@ -6,6 +6,8 @@ export interface ErrorMapping {
 }
 
 // Leverage inversion of control pattern to prevent circular dependency
+
+/** Add custom errors and the respective http status code you want */
 export class GlobalErrorRegistry {
     public static readonly errorMappings: ErrorMapping[] = [];
 
