@@ -1,3 +1,11 @@
+// Module
 export * from './lib/shared-idempotency.module';
-export * from './lib/idempotency.store.port';
-export * from './lib/idempotency.interceptor';
+
+// Port
+export * from './lib/port/idempotency.store.port';
+
+// Adapter
+export * from './lib/adapter/idempotency.store.adapter';
+
+// Interceptor
+export * from './lib/interceptor/idempotency.interceptor';
