@@ -1,8 +1,8 @@
 import { ConfigService } from '@nestjs/config';
-import { OutboxStatus, OutboxRecord } from './outbox.entity';
-import { IOutboxRepositoryPort } from './outbox.repository.port';
-import { IOutboxPublisherPort } from './outbox.publisher.port';
-import { OutboxProcessor } from './outbox.processor';
+import { OutboxStatus, OutboxRecord } from '../entity/outbox.entity';
+import { IOutboxRepositoryPort } from '../ports/outbox.repository.port';
+import { IOutboxPublisherPort } from '../ports/outbox.publisher.port';
+import { OutboxProcessor } from '../processor/outbox.processor';
 
 const makeRecord = (overrides: Partial<OutboxRecord> = {}): OutboxRecord => ({
     id: 'record-001',

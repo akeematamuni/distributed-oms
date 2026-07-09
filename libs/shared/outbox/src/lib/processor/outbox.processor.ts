@@ -1,8 +1,8 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
-import { IOutboxRepositoryPort, OUTBOX_REPOSITORY } from './outbox.repository.port';
-import { IOutboxPublisherPort, OUTBOX_PUBLISHER } from './outbox.publisher.port';
+import { IOutboxRepositoryPort, OUTBOX_REPOSITORY } from '../ports/outbox.repository.port';
+import { IOutboxPublisherPort, OUTBOX_PUBLISHER } from '../ports/outbox.publisher.port';
 
 @Injectable()
 export class OutboxProcessor {
