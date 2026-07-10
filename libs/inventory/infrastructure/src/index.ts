@@ -1,5 +1,3 @@
-export * from './lib/inventory-infrastructure.module';
-
 // Persistence
 export * from './lib/persistence/entities/inventory-node.typeorm-entity';
 export * from './lib/persistence/entities/inventory-reservation.typeorm-entity';
