@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { OutboxRecord, OutboxStatus } from '@doms/shared/outbox';
 import { OrderOutboxTypeOrmRepository } from './order-outbox.typeorm-repository';
 import { OrderOutboxTypeOrmEntity } from '../entities/order-outbox.typeorm-entity';
@@ -7,7 +7,6 @@ import { OrderOutboxTypeOrmEntity } from '../entities/order-outbox.typeorm-entit
 const makeMockRepo = (): jest.Mocked<Repository<OrderOutboxTypeOrmEntity>> =>
     ({
         save: jest.fn(),
-        find: jest.fn(),
         update: jest.fn(),
     }) as unknown as jest.Mocked<Repository<OrderOutboxTypeOrmEntity>>;
 
@@ -36,7 +35,8 @@ describe('OrderOutboxTypeOrmRepository', () => {
     describe('save', () => {
         it('should persist the outbox record', async () => {
             const record = makeOutboxRecord();
-            await repository.save(record);
+
+            await repository.save(record, undefined);
 
             expect(mockRepo.save).toHaveBeenCalledWith(record);
         });
@@ -45,41 +45,51 @@ describe('OrderOutboxTypeOrmRepository', () => {
             const mockQrRepo = {
                 save: jest.fn(),
             } as unknown as Repository<OrderOutboxTypeOrmEntity>;
-            const mockQr = { manager: { getRepository: jest.fn().mockReturnValue(mockQrRepo) } };
+
+            const mockQr = {
+                manager: {
+                    getRepository: jest.fn().mockReturnValue(mockQrRepo),
+                },
+            } as unknown as QueryRunner;
 
             await repository.save(makeOutboxRecord(), mockQr);
 
+            expect(mockQr.manager.getRepository).toHaveBeenCalledWith(OrderOutboxTypeOrmEntity);
             expect(mockQrRepo.save).toHaveBeenCalledTimes(1);
             expect(mockRepo.save).not.toHaveBeenCalled();
         });
     });
 
     describe('findPending', () => {
-        it('should query for PENDING records ordered by createdAt ascending', async () => {
-            mockRepo.find.mockResolvedValue([]);
-            await repository.findPending(10);
-
-            expect(mockRepo.find).toHaveBeenCalledWith({
-                where: { status: OutboxStatus.PENDING },
-                order: { createdAt: 'ASC' },
-                take: 10,
-            });
-        });
-
-        it('should return mapped records', async () => {
+        it('should execute the SKIP LOCKED query', async () => {
             const record = makeOutboxRecord();
-            mockRepo.find.mockResolvedValue([record as OrderOutboxTypeOrmEntity]);
-            const result = await repository.findPending(10);
 
-            expect(result).toHaveLength(1);
-            expect(result[0].eventType).toBe('order.created');
+            const mockQr = {
+                manager: {
+                    query: jest.fn().mockResolvedValue([record]),
+                },
+            } as unknown as QueryRunner;
+
+            const result = await repository.findPending(10, mockQr);
+
+            expect(mockQr.manager.query).toHaveBeenCalledWith(
+                `SELECT * FROM order_outboxes
+            WHERE status = 'PENDING'
+            ORDER BY created_at ASC
+            LIMIT $1
+            FOR UPDATE SKIP LOCKED`,
+                [10],
+            );
+
+            expect(result).toEqual([record]);
         });
     });
 
     describe('markPublished', () => {
         it('should update status to PUBLISHED and set publishedAt', async () => {
             const id = randomUUID();
-            await repository.markPublished(id);
+
+            await repository.markPublished(id, undefined);
 
             expect(mockRepo.update).toHaveBeenCalledWith(
                 id,
@@ -89,12 +99,39 @@ describe('OrderOutboxTypeOrmRepository', () => {
                 }),
             );
         });
+
+        it('should use queryRunner manager when provided', async () => {
+            const mockQrRepo = {
+                update: jest.fn(),
+            } as unknown as Repository<OrderOutboxTypeOrmEntity>;
+
+            const mockQr = {
+                manager: {
+                    getRepository: jest.fn().mockReturnValue(mockQrRepo),
+                },
+            } as unknown as QueryRunner;
+
+            const id = randomUUID();
+
+            await repository.markPublished(id, mockQr);
+
+            expect(mockQr.manager.getRepository).toHaveBeenCalledWith(OrderOutboxTypeOrmEntity);
+            expect(mockQrRepo.update).toHaveBeenCalledWith(
+                id,
+                expect.objectContaining({
+                    status: OutboxStatus.PUBLISHED,
+                    publishedAt: expect.any(Date),
+                }),
+            );
+            expect(mockRepo.update).not.toHaveBeenCalled();
+        });
     });
 
     describe('markFailed', () => {
         it('should update status to FAILED and increment retryCount atomically', async () => {
             const id = randomUUID();
-            await repository.markFailed(id);
+
+            await repository.markFailed(id, undefined);
 
             expect(mockRepo.update).toHaveBeenCalledWith(
                 id,
@@ -103,6 +140,32 @@ describe('OrderOutboxTypeOrmRepository', () => {
                     retryCount: expect.any(Function),
                 }),
             );
+        });
+
+        it('should use queryRunner manager when provided', async () => {
+            const mockQrRepo = {
+                update: jest.fn(),
+            } as unknown as Repository<OrderOutboxTypeOrmEntity>;
+
+            const mockQr = {
+                manager: {
+                    getRepository: jest.fn().mockReturnValue(mockQrRepo),
+                },
+            } as unknown as QueryRunner;
+
+            const id = randomUUID();
+
+            await repository.markFailed(id, mockQr);
+
+            expect(mockQr.manager.getRepository).toHaveBeenCalledWith(OrderOutboxTypeOrmEntity);
+            expect(mockQrRepo.update).toHaveBeenCalledWith(
+                id,
+                expect.objectContaining({
+                    status: OutboxStatus.FAILED,
+                    retryCount: expect.any(Function),
+                }),
+            );
+            expect(mockRepo.update).not.toHaveBeenCalled();
         });
     });
 });
