@@ -33,19 +33,27 @@ export class OutboxProcessor {
             return;
         }
 
-        for (const record of pending) {
-            try {
-                await this.publisher.publish(record.eventType, record.payload);
-                await this.repository.markPublished(record.id, queryRunner);
-            } catch (error) {
-                this.logger.error(
-                    `Failed to publish outbox record ${record.id} (${record.eventType}) | CorrelationId (${record.payload['correlationId']}) : ${error}`,
-                );
-                await this.repository.markFailed(record.id, queryRunner);
+        try {
+            // Publish each record
+            for (const record of pending) {
+                try {
+                    await this.publisher.publish(record.eventType, record.payload);
+                    await this.repository.markPublished(record.id, queryRunner);
+                } catch (error) {
+                    this.logger.error(
+                        `Failed to publish outbox record ${record.id} (${record.eventType}) | CorrelationId (${record.payload['correlationId']}) : ${error}`,
+                    );
+                    await this.repository.markFailed(record.id, queryRunner);
+                }
             }
-        }
 
-        await queryRunner.commitTransaction();
-        await queryRunner.release();
+            await queryRunner.commitTransaction();
+        } catch (error) {
+            // If error were to occur outside of publishing
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            await queryRunner.release();
+        }
     }
 }
