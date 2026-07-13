@@ -44,6 +44,7 @@ import { ORDER_REPOSITORY } from '@doms/order/domain';
         TypeOrmModule.forRootAsync({
             inject: [ConfigService],
             useFactory: (config: ConfigService) => ({
+                type: 'postgres',
                 url: config.get('ORDER_DB_URL'),
                 entities: [OrderTypeOrmEntity, OrderLineTypeOrmEntity, OrderOutboxTypeOrmEntity],
                 synchronize: false,
@@ -59,12 +60,11 @@ import { ORDER_REPOSITORY } from '@doms/order/domain';
     ],
     providers: [
         OutboxProcessor,
-        IdempotencyInterceptor,
         CreateOrderHandler,
         GetOrderHandler,
 
-        { provide: APP_FILTER, useExisting: AllExceptionFilter },
-        { provide: APP_INTERCEPTOR, useExisting: IdempotencyInterceptor },
+        { provide: APP_FILTER, useClass: AllExceptionFilter },
+        { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
 
         { provide: ORDER_REPOSITORY, useClass: OrderTypeOrmRepository },
         { provide: OUTBOX_REPOSITORY, useClass: OrderOutboxTypeOrmRepository },
