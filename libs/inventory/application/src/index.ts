@@ -1,5 +1,3 @@
-export * from './lib/inventory-application.module';
-
 // Commands
 export * from './lib/commands/reserve-inventory.command';
 export * from './lib/commands/reserve-inventory.handler';
