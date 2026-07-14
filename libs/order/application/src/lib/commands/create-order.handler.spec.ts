@@ -26,7 +26,6 @@ const validCommand = new CreateOrderCommand(
             currency: 'USD',
         },
     ],
-    '1714e15b-cfad-48b9-adbb-b2973a1f682f',
 );
 
 // Mocks
@@ -104,7 +103,6 @@ describe('CreateOrderHandler', () => {
                 lines: [],
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                correlationId: validCommand.correlationId,
             };
 
             mockIdempotencyStore.get.mockResolvedValueOnce(cachedResponse);
@@ -148,7 +146,6 @@ describe('CreateOrderHandler', () => {
             const result = await handler.execute(validCommand);
 
             expect(result.customerId).toBe(validCommand.customerId);
-            expect(result.correlationId).toBe(validCommand.correlationId);
             expect(result.channel).toBe(validCommand.channel);
             expect(result.status).toBe(OrderStatusEnum.DRAFT);
             expect(result.totalAmount).toBe(2000);
@@ -211,7 +208,6 @@ describe('CreateOrderHandler', () => {
                 validCommand.channel,
                 validCommand.shippingAddress,
                 [],
-                validCommand.correlationId,
             );
 
             await expect(handler.execute(invalidCommand)).rejects.toThrow();
@@ -229,7 +225,6 @@ describe('CreateOrderHandler', () => {
                     { ...validCommand.lines[0], currency: 'GBP' },
                     { ...validCommand.lines[0], sku: 'GADGET-1234', currency: 'USD' },
                 ],
-                validCommand.correlationId,
             );
 
             await expect(handler.execute(invalidCommand)).rejects.toThrow();

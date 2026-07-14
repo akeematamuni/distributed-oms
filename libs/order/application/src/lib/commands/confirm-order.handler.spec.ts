@@ -101,13 +101,12 @@ describe('ConfirmOrderHandler', () => {
     afterEach(() => jest.clearAllMocks());
 
     describe('Idempotency', () => {
-        it('should return cache if correlationId is already processed', async () => {
-            const cachedResponse = { orderId: mockOrder.id, status: OrderStatusEnum.CONFIRMED };
+        it('should return if correlationId is already processed', async () => {
+            const cachedResponse = { orderId: mockOrder.id, success: true };
             mockIdempotencyStore.get.mockResolvedValueOnce(cachedResponse);
 
-            const result = await handler.execute(validCommand);
+            await handler.execute(validCommand);
 
-            expect(result).toBe(cachedResponse);
             expect(mockQueryRunner.startTransaction).not.toHaveBeenCalled();
             expect(mockOrderRepository.findById).not.toHaveBeenCalled();
         });
@@ -142,20 +141,12 @@ describe('ConfirmOrderHandler', () => {
             );
         });
 
-        it('should return response with CONFIRMED status', async () => {
-            const result = await handler.execute(validCommand);
-
-            expect(result.orderId).toBe(mockOrder.id);
-            expect(result.status).toBe(OrderStatusEnum.CONFIRMED);
-            expect(result.correlationId).toBe(validCommand.correlationId);
-        });
-
         it('should cache the response after successful confirmation', async () => {
-            const result = await handler.execute(validCommand);
+            await handler.execute(validCommand);
 
             expect(mockIdempotencyStore.set).toHaveBeenCalledWith(
                 `${validCommand.correlationId}:confirm-order`,
-                result,
+                { orderId: mockOrder.id, success: true },
                 86400,
             );
         });

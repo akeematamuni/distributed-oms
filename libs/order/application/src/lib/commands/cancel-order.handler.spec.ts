@@ -110,13 +110,12 @@ describe('CancelOrderHandler', () => {
     afterEach(() => jest.clearAllMocks());
 
     describe('Idempotency', () => {
-        it('should return cache if correlationId is already processed', async () => {
-            const cachedResponse = { orderId: mockOrder.id, status: OrderStatusEnum.CANCELLED };
+        it('should return if correlationId is already processed', async () => {
+            const cachedResponse = { orderId: mockOrder.id, success: true };
             mockIdempotencyStore.get.mockResolvedValueOnce(cachedResponse);
 
-            const result = await handler.execute(validCommand);
+            await handler.execute(validCommand);
 
-            expect(result).toBe(cachedResponse);
             expect(mockQueryRunner.startTransaction).not.toHaveBeenCalled();
             expect(mockOrderRepository.findById).not.toHaveBeenCalled();
         });
@@ -151,20 +150,12 @@ describe('CancelOrderHandler', () => {
             );
         });
 
-        it('should return response with CANCELLED status and reason', async () => {
-            const result = await handler.execute(validCommand);
-
-            expect(result.orderId).toBe(mockOrder.id);
-            expect(result.status).toBe(OrderStatusEnum.CANCELLED);
-            expect(result.correlationId).toBe(validCommand.correlationId);
-        });
-
         it('should cache the response after successful cancellation', async () => {
-            const result = await handler.execute(validCommand);
+            await handler.execute(validCommand);
 
             expect(mockIdempotencyStore.set).toHaveBeenCalledWith(
                 `${validCommand.correlationId}:cancel-order`,
-                result,
+                { orderId: mockOrder.id, success: true },
                 86400,
             );
         });
