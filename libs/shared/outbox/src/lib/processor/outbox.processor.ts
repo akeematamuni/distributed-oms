@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { IOutboxRepositoryPort, OUTBOX_REPOSITORY } from '../ports/outbox.repository.port';
 import { IOutboxPublisherPort, OUTBOX_PUBLISHER } from '../ports/outbox.publisher.port';
+import { OutboxRecord } from '../entity/outbox.entity';
 
 @Injectable()
 export class OutboxProcessor {
@@ -16,6 +17,21 @@ export class OutboxProcessor {
         @Inject(OUTBOX_PUBLISHER) private readonly publisher: IOutboxPublisherPort,
     ) {}
 
+    /** Align raw data from databse to expected record shape */
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    private mapToRecord(row: any): OutboxRecord {
+        return {
+            id: row.id,
+            eventType: row.event_type,
+            eventVersion: row.event_version,
+            payload: row.payload,
+            status: row.status,
+            createdAt: row.created_at,
+            publishedAt: row.published_at,
+            retryCount: row.retry_count,
+        };
+    }
+
     @Cron(CronExpression.EVERY_SECOND)
     async process(): Promise<void> {
         const batchSize = this.configService.get('OUTBOX_BATCH_SIZE', 100);
@@ -25,7 +41,8 @@ export class OutboxProcessor {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        const pending = await this.repository.findPending(batchSize, queryRunner);
+        const rawPending = await this.repository.findPending(batchSize, queryRunner);
+        const pending = rawPending.map(this.mapToRecord);
 
         if (pending.length < 1) {
             await queryRunner.commitTransaction();
