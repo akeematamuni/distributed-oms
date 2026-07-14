@@ -1,22 +1,57 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { WinstonModule } from 'nest-winston';
+import { config } from 'dotenv';
+
+import { baseLogger } from '@doms/shared/utils';
 import { AppModule } from './app/app.module';
 
+config();
+
 async function bootstrap() {
-    // Remember winston and co
-    const app = await NestFactory.create(AppModule);
-    const globalPrefix = 'api';
+    const winstonLogger = WinstonModule.createLogger({ instance: baseLogger });
+    const app = await NestFactory.create(AppModule, { logger: winstonLogger, bufferLogs: true });
+
+    // const app = await NestFactory.create(AppModule);
+
+    const logger = new Logger('Bootstrap');
+    const config = app.get(ConfigService);
+    const globalPrefix = config.get('GLOBAL_PREFIX');
+    const port = config.get('ORDER_CAPTURE_PORT', 3001);
+
+    // Setup validation pipe
+
     app.setGlobalPrefix(globalPrefix);
-    const port = process.env.PORT || 3000;
+
+    const swaggerConfig = new DocumentBuilder()
+        .setTitle('Distributed Order Management System')
+        .setDescription(
+            'Developed with DDD + EDA + Hexagonal Architecture + CQRS\n\nMade with ❤️ by Akeem Amuni',
+        )
+        .setVersion('1.0.0')
+        .build();
+
+    try {
+        const document = SwaggerModule.createDocument(app, swaggerConfig);
+        SwaggerModule.setup(`${globalPrefix}/docs`, app, document, {
+            swaggerOptions: {
+                persistAuthorization: true,
+                operationsSorter: 'alpha',
+                tagsSorter: 'alpha',
+            },
+            customSiteTitle: 'Order Capture Service',
+        });
+    } catch (error) {
+        console.error('Swagger failed on:', error.message);
+        console.error(error.stack);
+    }
+
     await app.listen(port);
-    Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
+
+    logger.log(`Application is running on: http://localhost:${port}/${globalPrefix}`);
+    console.log(`Application is running on: http://localhost:${port}/${globalPrefix}`);
 }
 
 bootstrap();
-
-// apps/order-capture
-// main.ts:
-// - Creates NestJS app
-// - Enables validation pipe (class-validator)
-// - Sets global prefix /api/v1
-// - Listens on configurable port (from env)
