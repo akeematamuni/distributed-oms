@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, OnModuleDestroy } from '@nestjs/common';
 // import { ClientKafka } from '@nestjs/microservices';
 import { Producer } from 'kafkajs';
 // import { firstValueFrom } from 'rxjs';
@@ -6,8 +6,12 @@ import { KAFKA_PRODUCER } from '@doms/shared/kafka';
 import { IOutboxPublisherPort } from '../ports/outbox.publisher.port';
 
 @Injectable()
-export class OutboxPublisherAdapter implements IOutboxPublisherPort {
+export class OutboxPublisherAdapter implements OnModuleDestroy, IOutboxPublisherPort {
     constructor(@Inject(KAFKA_PRODUCER) private readonly producer: Producer) {}
+
+    async onModuleDestroy() {
+        await this.producer.disconnect();
+    }
 
     async publish(topic: string, payload: Record<string, unknown>): Promise<void> {
         await this.producer.send({
