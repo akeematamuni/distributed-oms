@@ -9,8 +9,9 @@ import {
     Body,
     ValidationPipe,
     ParseUUIDPipe,
+    UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiResponse, ApiHeader } from '@nestjs/swagger';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import {
@@ -20,7 +21,7 @@ import {
     GetOrderQuery,
 } from '@doms/order/application';
 
-import { CorrelationId } from '@doms/shared/idempotency';
+import { IdempotencyInterceptor } from '@doms/shared/idempotency';
 
 import { AppService } from './app.service';
 
@@ -38,31 +39,25 @@ export class AppController {
     }
 
     @Post('/orders')
+    @UseInterceptors(IdempotencyInterceptor)
     @HttpCode(HttpStatus.CREATED)
     @ApiBody({ type: () => CreateOrderDto })
     @ApiResponse({ status: 201, type: () => OrderResponseDto })
-    async create(
-        @Body(ValidationPipe) dto: CreateOrderDto,
-        @CorrelationId() correlationId: string,
-    ): Promise<OrderResponseDto> {
+    @ApiHeader({
+        name: 'Idempotency-Key',
+        description: 'UUID key to safely retry order creation',
+        required: true,
+    })
+    async create(@Body(ValidationPipe) dto: CreateOrderDto): Promise<OrderResponseDto> {
         return await this.commandBus.execute(
-            new CreateOrderCommand(
-                dto.customerId,
-                dto.channel,
-                dto.shippingAddress,
-                dto.lines,
-                correlationId,
-            ),
+            new CreateOrderCommand(dto.customerId, dto.channel, dto.shippingAddress, dto.lines),
         );
     }
 
     @Get('/orders/:id')
     @ApiParam({ name: 'id', type: String })
     @ApiResponse({ status: 200, type: () => OrderResponseDto })
-    async find(
-        @Param('id', ParseUUIDPipe) id: string,
-        @CorrelationId() correlationId: string,
-    ): Promise<OrderResponseDto> {
-        return await this.queryBus.execute(new GetOrderQuery(id, correlationId));
+    async find(@Param('id', ParseUUIDPipe) id: string): Promise<OrderResponseDto> {
+        return await this.queryBus.execute(new GetOrderQuery(id));
     }
 }
