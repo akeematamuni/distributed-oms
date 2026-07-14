@@ -7,7 +7,7 @@ export interface MoneyProps {
 
 export class Money extends ValueObjectBase<MoneyProps> {
     static create(amount: number, currency: string): Money {
-        if (!Number.isInteger(amount) || amount < 0) {
+        if (!Number(amount) || amount < 0) {
             throw new Error(`Amount must be a non-negative integer. You provided: ${amount}`);
         }
 
@@ -25,7 +25,7 @@ export class Money extends ValueObjectBase<MoneyProps> {
             );
         }
 
-        const amount = this.props.amount + other.props.amount;
+        const amount = (this.props.amount * 100 + other.props.amount * 100) / 100;
         return new Money({ amount, currency: this.props.currency });
     }
 
