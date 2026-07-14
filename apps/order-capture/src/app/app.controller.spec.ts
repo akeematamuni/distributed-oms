@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { CreateOrderCommand, GetOrderQuery } from '@doms/order/application';
+import { ConfigService } from '@nestjs/config';
+import { IDEMPOTENCY_STORE } from '@doms/shared/idempotency';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -20,6 +21,8 @@ describe('AppController', () => {
                     provide: AppService,
                     useValue: { getData: jest.fn().mockReturnValue({ message: 'Hello' }) },
                 },
+                { provide: ConfigService, useValue: { get: jest.fn() } },
+                { provide: IDEMPOTENCY_STORE, useValue: {} },
             ],
         }).compile();
 
@@ -48,37 +51,34 @@ describe('AppController', () => {
                 lines: [],
             } as any;
 
-            const correlationId = 'corr-123';
             const expectedResult = { id: 'order-1' };
 
             jest.spyOn(commandBus, 'execute').mockResolvedValue(expectedResult);
 
-            const result = await controller.create(dto, correlationId);
+            const result = await controller.create(dto);
 
             expect(commandBus.execute).toHaveBeenCalledWith(
-                new CreateOrderCommand(
-                    dto.customerId,
-                    dto.channel,
-                    dto.shippingAddress,
-                    dto.lines,
-                    correlationId,
-                ),
+                expect.objectContaining({
+                    customerId: dto.customerId,
+                    channel: dto.channel,
+                    shippingAddress: dto.shippingAddress,
+                    lines: dto.lines,
+                }),
             );
             expect(result).toBe(expectedResult);
         });
     });
 
     describe('find', () => {
-        it('should dispatch GetOrderQuery with correct ID and correlationId', async () => {
+        it('should dispatch GetOrderQuery with correct ID', async () => {
             const id = '550e8400-e29b-41d4-a716-446655440000';
-            const correlationId = 'corr-456';
             const expectedResult = { id };
 
             jest.spyOn(queryBus, 'execute').mockResolvedValue(expectedResult);
 
-            const result = await controller.find(id, correlationId);
+            const result = await controller.find(id);
 
-            expect(queryBus.execute).toHaveBeenCalledWith(new GetOrderQuery(id, correlationId));
+            expect(queryBus.execute).toHaveBeenCalledWith(expect.objectContaining({ orderId: id }));
             expect(result).toBe(expectedResult);
         });
     });
