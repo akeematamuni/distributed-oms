@@ -16,7 +16,7 @@ async function bootstrap() {
 
     // const app = await NestFactory.create(AppModule);
 
-    const logger = new Logger('Bootstrap');
+    const logger = new Logger('Order-Capture');
     const config = app.get(ConfigService);
     const globalPrefix = config.get('GLOBAL_PREFIX');
     const port = config.get('ORDER_CAPTURE_PORT', 3001);
@@ -50,8 +50,8 @@ async function bootstrap() {
 
     await app.listen(port);
 
-    logger.log(`Application is running on: http://localhost:${port}/${globalPrefix}`);
-    console.log(`Application is running on: http://localhost:${port}/${globalPrefix}`);
+    logger.log(`Order-Capture is running on: http://localhost:${port}/${globalPrefix}`);
+    console.log(`Order-Capture is running on: http://localhost:${port}/${globalPrefix}`);
 }
 
 bootstrap();
