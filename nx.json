@@ -33,7 +33,12 @@
             "options": {
                 "targetName": "test"
             },
-            "exclude": ["apps/order-capture-e2e/**/*", "apps/order-orchestrator-e2e/**/*"]
+            "exclude": [
+                "apps/order-capture-e2e/**/*",
+                "apps/order-orchestrator-e2e/**/*",
+                "apps/inventory-e2e/**/*",
+                "apps/notification-e2e/**/*"
+            ]
         },
         {
             "plugin": "@nx/webpack/plugin",

@@ -36,6 +36,42 @@
                 "${workspaceFolder}/apps/order-orchestrator/dist/**/*.(m|c|)js",
                 "!**/node_modules/**"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug inventory with Nx",
+            "runtimeExecutable": "pnpm",
+            "runtimeArgs": ["exec", "nx", "serve", "inventory"],
+            "env": {
+                "NODE_OPTIONS": "--inspect=9231"
+            },
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": ["<node_internals>/**"],
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/apps/inventory/dist/**/*.(m|c|)js",
+                "!**/node_modules/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug notification with Nx",
+            "runtimeExecutable": "pnpm",
+            "runtimeArgs": ["exec", "nx", "serve", "notification"],
+            "env": {
+                "NODE_OPTIONS": "--inspect=9232"
+            },
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": ["<node_internals>/**"],
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/apps/notification/dist/**/*.(m|c|)js",
+                "!**/node_modules/**"
+            ]
         }
     ]
 }
