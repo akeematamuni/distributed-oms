@@ -31,6 +31,7 @@ describe('InventoryMapper', () => {
             expect(domain.id).toBe('node-agg-id');
             expect(domain.sku).toBe('WIDGET-1234');
             expect(domain.nodeId).toBe('node-001');
+            expect(domain.version).toBe(1);
             expect(domain.onHand.value).toBe(100);
             expect(domain.reserved.value).toBe(10);
             expect(domain.available.value).toBe(90);
@@ -68,6 +69,7 @@ describe('InventoryMapper', () => {
             expect(entity.id).toBe('node-agg-id');
             expect(entity.sku).toBe('WIDGET-1234');
             expect(entity.nodeId).toBe('node-001');
+            expect(entity.version).toBe(1);
             expect(entity.onHand).toBe(100);
             expect(entity.reserved).toBe(10);
         });
