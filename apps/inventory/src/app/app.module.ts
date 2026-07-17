@@ -14,6 +14,7 @@ import {
     GetAvailabilityHandler,
     ReserveInventoryHandler,
     ReleaseReservationHandler,
+    GetAvailabilityService,
 } from '@doms/inventory/application';
 
 import {
@@ -68,6 +69,7 @@ import { InventoryConsumer } from './inventory.consumer';
         ReleaseReservationHandler,
         OutboxProcessor,
         InventoryConsumer,
+        GetAvailabilityService,
 
         { provide: APP_FILTER, useClass: AllExceptionFilter },
 
