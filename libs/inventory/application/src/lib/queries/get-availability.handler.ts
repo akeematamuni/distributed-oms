@@ -5,12 +5,12 @@ import {
     IInventoryRepositoryPort,
     AtpCalculatorService,
 } from '@doms/inventory/domain';
-import { AvailabilityResponseDto } from '../dtos/availability-response.dto';
+import { AvailabilityResponseDto, NodeAvailabilityDto } from '../dtos/availability-response.dto';
 import { GetAvailabilityQuery } from './get-availability.query';
 
 /**
- * Consumer in apps/inventory calls this handler first
- * Then the data response tells the logic what node to reserve on
+ * The data response tells the caller what node can be reserved on
+ * The logic here can also be separated into an application service to avoid handler chaining
  */
 @QueryHandler(GetAvailabilityQuery)
 export class GetAvailabilityHandler implements IQueryHandler<GetAvailabilityQuery> {
@@ -19,23 +19,32 @@ export class GetAvailabilityHandler implements IQueryHandler<GetAvailabilityQuer
         private readonly inventoryRepositiry: IInventoryRepositoryPort,
     ) {}
 
-    async execute(query: GetAvailabilityQuery): Promise<AvailabilityResponseDto | null> {
-        const inventoryNodes = await this.inventoryRepositiry.findBySku(query.sku);
-        if (inventoryNodes.length < 1) return null;
+    async execute(query: GetAvailabilityQuery): Promise<AvailabilityResponseDto[] | null> {
+        const { skus } = query;
+        const inventoryNodeMap = await this.inventoryRepositiry.findBySkus(skus);
 
-        let totalAvailable = 0;
-        let nodes: Array<{ nodeId: string; available: number }> = [];
+        // Orders can't be fulfilled when length aren't equal
+        if (inventoryNodeMap.size !== skus.length) return null;
 
-        for (const inventoryNode of inventoryNodes) {
-            const available = AtpCalculatorService.calculate(inventoryNode).value;
-            nodes.push({ available, nodeId: inventoryNode.nodeId });
-            totalAvailable += available;
+        const response: AvailabilityResponseDto[] = [];
+
+        for (const sku of inventoryNodeMap.keys()) {
+            const inventoryNodes = inventoryNodeMap.get(sku);
+
+            if (inventoryNodes) {
+                let totalAvailable = 0;
+                const nodes: NodeAvailabilityDto[] = [];
+
+                for (const node of inventoryNodes) {
+                    const available = AtpCalculatorService.calculate(node).value;
+                    nodes.push({ available, nodeId: node.nodeId });
+                    totalAvailable += available;
+                }
+
+                response.push({ sku, totalAvailable, nodes });
+            }
         }
 
-        return {
-            sku: inventoryNodes[0].sku,
-            totalAvailable,
-            nodes,
-        };
+        return response;
     }
 }
