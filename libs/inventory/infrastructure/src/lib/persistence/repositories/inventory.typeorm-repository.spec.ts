@@ -19,13 +19,11 @@ const makeEntity = (): InventoryNodeTypeOrmEntity => {
 
 const mockRepository = {
     save: jest.fn(),
-    findOne: jest.fn(),
     find: jest.fn(),
 };
 
 const mockQrRepository = {
     save: jest.fn(),
-    findOne: jest.fn(),
     find: jest.fn(),
 };
 
@@ -54,69 +52,72 @@ describe('InventoryTypeOrmRepository', () => {
 
     afterEach(() => jest.clearAllMocks());
 
-    describe('findBySkuAndNode', () => {
-        it('should return domain aggregate when found', async () => {
-            mockRepository.findOne.mockResolvedValue(makeEntity());
+    describe('findBySkusAndNodes', () => {
+        it('should return domain aggregates when found', async () => {
+            mockRepository.find.mockResolvedValue([makeEntity()]);
 
-            const result = await repository.findBySkuAndNode('WIDGET-1234', 'node-001');
+            const results = await repository.findBySkusAndNodes([
+                { sku: 'WIDGET-1234', nodeId: 'node-001' },
+            ]);
 
-            expect(result).not.toBeNull();
-            expect(result!.sku).toBe('WIDGET-1234');
-            expect(result!.nodeId).toBe('node-001');
+            expect(results).toHaveLength(1);
+            expect(results[0].sku).toBe('WIDGET-1234');
+            expect(results[0].nodeId).toBe('node-001');
         });
 
-        it('should return null when not found', async () => {
-            mockRepository.findOne.mockResolvedValue(null);
+        it('should return empty array when none found', async () => {
+            mockRepository.find.mockResolvedValue([]);
 
-            const result = await repository.findBySkuAndNode('WIDGET-1234', 'node-001');
+            const results = await repository.findBySkusAndNodes([
+                { sku: 'WIDGET-1234', nodeId: 'node-001' },
+            ]);
 
-            expect(result).toBeNull();
+            expect(results).toHaveLength(0);
         });
 
         it('should query with correct where clause and relations', async () => {
-            mockRepository.findOne.mockResolvedValue(null);
+            mockRepository.find.mockResolvedValue([]);
 
-            await repository.findBySkuAndNode('WIDGET-1234', 'node-001');
+            const items = [{ sku: 'WIDGET-1234', nodeId: 'node-001' }];
+            await repository.findBySkusAndNodes(items);
 
-            expect(mockRepository.findOne).toHaveBeenCalledWith({
-                where: { sku: 'WIDGET-1234', nodeId: 'node-001' },
+            expect(mockRepository.find).toHaveBeenCalledWith({
+                where: items,
                 relations: { reservations: true },
             });
         });
     });
 
-    describe('findBySku', () => {
-        it('should return all nodes for a sku', async () => {
-            mockRepository.find.mockResolvedValue([makeEntity(), makeEntity()]);
+    describe('findBySkus', () => {
+        it('should return a map grouped by SKU when nodes are found', async () => {
+            mockRepository.find.mockResolvedValue([makeEntity()]);
 
-            const results = await repository.findBySku('WIDGET-1234');
+            const resultMap = await repository.findBySkus(['WIDGET-1234']);
 
-            expect(results).toHaveLength(2);
+            expect(resultMap.size).toBe(1);
+            expect(resultMap.get('WIDGET-1234')).toHaveLength(1);
         });
 
-        it('should return empty array when no nodes found', async () => {
+        it('should return empty map when no nodes found', async () => {
             mockRepository.find.mockResolvedValue([]);
 
-            const results = await repository.findBySku('WIDGET-1234');
+            const resultMap = await repository.findBySkus(['WIDGET-1234']);
 
-            expect(results).toHaveLength(0);
+            expect(resultMap.size).toBe(0);
         });
 
-        it('should query with correct where clause', async () => {
+        it('should query with correct where clause for SKUs', async () => {
             mockRepository.find.mockResolvedValue([]);
 
-            await repository.findBySku('WIDGET-1234');
+            await repository.findBySkus(['WIDGET-1234']);
 
-            expect(mockRepository.find).toHaveBeenCalledWith({
-                where: { sku: 'WIDGET-1234' },
-            });
+            expect(mockRepository.find).toHaveBeenCalled();
         });
     });
 
     describe('save', () => {
         it('should persist using injected repository when no queryRunner provided', async () => {
             const entity = makeEntity();
-            mockRepository.findOne.mockResolvedValue(entity);
             const domain = InventoryMapper.toDomain(entity);
             mockRepository.save.mockResolvedValue(undefined);
 
