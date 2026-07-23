@@ -9,7 +9,7 @@ import {
     HttpStatus,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Observable, of, concatMap } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { IDEMPOTENCY_STORE, IIdempotencyStorePort } from '../port/idempotency.store.port';
 
 const IDEMPOTENCY_KEY_HEADER = 'idempotency-key';
@@ -58,7 +58,7 @@ export class IdempotencyInterceptor implements NestInterceptor {
 
         const ttlSeconds = this.config.get('TTL_SECONDS', 86400);
         return next.handle().pipe(
-            concatMap(async (response) => {
+            tap(async (response) => {
                 await this.store.set(scopedKey, response, ttlSeconds);
             }),
         );
