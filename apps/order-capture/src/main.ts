@@ -28,11 +28,12 @@ async function bootstrap() {
     const swaggerConfig = new DocumentBuilder()
         .setTitle('Distributed Order Management System')
         .setDescription(
-            'Developed with DDD + EDA + Hexagonal Architecture + CQRS\n\nMade with ❤️ by Akeem Amuni',
+            'Developed with DDD + EDA + Hexagonal Architecture + CQRS\n\nMade with ❤️ by Emmanuel Amuni',
         )
         .setVersion('1.0.0')
         .build();
 
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     try {
         const document = SwaggerModule.createDocument(app, swaggerConfig);
         SwaggerModule.setup(`${globalPrefix}/docs`, app, document, {
@@ -43,7 +44,7 @@ async function bootstrap() {
             },
             customSiteTitle: 'Order Capture Service',
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Swagger failed on:', error.message);
         console.error(error.stack);
     }
