@@ -54,6 +54,7 @@
         "infra:down": "docker compose -f ./infra/compose.yaml down",
         "migration:run:order": "tsx libs/order/infrastructure/src/lib/db-configs/migration.config.ts",
         "migration:run:inventory": "tsx libs/inventory/infrastructure/src/lib/db-configs/migration.config.ts",
+        "seed:inventory": "tsx libs/inventory/infrastructure/src/lib/db-configs/seed-inventory.config.ts",
         "start:order-capture": "tsx apps/order-capture/src/main.ts",
         "start:order-orchestrator": "tsx apps/order-orchestrator/src/main.ts",
         "start:inventory": "tsx apps/inventory/src/main.ts",
