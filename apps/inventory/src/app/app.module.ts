@@ -11,7 +11,6 @@ import { IDEMPOTENCY_STORE, IdempotencyStoreAdapter } from '@doms/shared/idempot
 import { SharedKafkaModule } from '@doms/shared/kafka';
 
 import {
-    GetAvailabilityHandler,
     ReserveInventoryHandler,
     ReleaseReservationHandler,
     GetAvailabilityService,
@@ -64,7 +63,6 @@ import { InventoryConsumer } from './inventory.consumer';
         CqrsModule,
     ],
     providers: [
-        GetAvailabilityHandler,
         ReserveInventoryHandler,
         ReleaseReservationHandler,
         OutboxProcessor,
