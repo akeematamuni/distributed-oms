@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { OrderLineInput } from '../types/order-line.type';
 
 export class OrderLineDto implements OrderLineInput {
-    @ApiProperty({ type: String, example: 'TOOL-0012' })
+    @ApiProperty({ type: String, example: 'WIDGET-0001' })
     @IsString()
     @IsNotEmpty()
     sku!: string;
